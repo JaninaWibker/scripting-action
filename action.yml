@@ -1,0 +1,64 @@
+name: 'Scripting Action'
+author: 'Janina Wibker'
+description: |
+  Proper scripting with TypeScript in Github Actions using bun. Includes sane defaults, useful helpers, an authenticated octokit instance and other useful integrations.
+  Inspired by actions/github-script.
+
+inputs:
+  file:
+    description: 'Relative path to typescript file. This requires doing a checkout beforehand. Can only specify either `file` or `script`, not both.'
+    required: false
+
+  script:
+    description: 'Inline typescript, same behavior as `file`, but without having to import the supplied helpers. Can only specify either `file` or `script`, not both.'
+    required: false
+
+  result-encoding:
+    description: 'Either string or json, if returning '
+    required: false
+    default: 'string'
+
+  input-encoding:
+    description: ''
+    required: false
+    default: 'string'
+
+  input:
+    description: 'Input passed to script. Depending on `input-encoding` either assumed to be a string, or passed to `JSON.parse`. Defaults to `""` or `{}` respectively. Alternatively to easier pass in more values at once use environment variables.'
+    required: false
+
+  github-token:
+    description: 'The GitHub token used to create an authenticated client'
+    default: '${{ github.token }}'
+    required: false
+
+  debug:
+    description: 'Whether to tell the GitHub client to log details of its requests. true or false. Default is to run in debug mode when the GitHub Actions step debug logging is turned on.'
+    default: "${{ runner.debug == '1' }}"
+
+
+outputs:
+  result:
+    description: 'The return value of the script. Depending on `result-encoding` either assumed to be a string, or passed to `JSON.stringify`'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Install bun'
+      uses: 'oven-sh/setup-bun@v2.1.2'
+      with:
+        bun-version-file: '${{ github.action_path }}/package.json'
+
+    - name: 'Install dependencies'
+      working-directory: '${{ github.action_path }}'
+      env:
+        GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}' # TODO: does this work?
+      runs: 'bun install'
+
+    - name: 'TODO'
+      runs: |
+        echo 123
+
+# use ${{ github.action_path }} for local files
+# use bun, use zx, authenticate github client and things
+#
