@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { randomUUIDv7 } from 'bun'
 
 const template = (script: string) => `
@@ -27,13 +28,16 @@ export const build = async (script: string, base: string) => {
       'Provided script is not parseable, likely due to escaping issues. Please check the script content and escaping.'
     )
 
-  const scriptPath = `${base}/script-${randomUUIDv7()}.ts`
+  const id = randomUUIDv7()
+  const inputPath = path.join(base, `script-${id}.ts`)
+  const outputPath = path.join(base, `script-${id}.js`)
 
-  const build = await Bun.build({
-    entrypoints: [scriptPath],
+  await Bun.build({
+    entrypoints: [inputPath],
     files: {
-      [scriptPath]: template(script)
+      [inputPath]: template(script)
     },
+    outdir: '.',
     target: 'bun',
     format: 'esm',
     splitting: false,
@@ -42,8 +46,7 @@ export const build = async (script: string, base: string) => {
     external: ['zx', 'somewhere']
   })
 
-  const path = build.outputs.find(({ kind }) => kind === 'entry-point')!.path
-  const main = (await import(path)).default
+  const main = (await import(outputPath)).default
 
-  return { path, main }
+  return { path: outputPath, main }
 }

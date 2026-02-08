@@ -3,14 +3,38 @@ on:
   push:
   workflow_dispatch:
 
+env:
+  ACTIONS_STEP_DEBUG: true
+
 jobs:
   test:
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v6'
       - uses: 'JaninaWibker/scripting-action@main'
+        id: run-a
         with:
-          input-encoding: 'string'
+          token: '${{ secrets.GITHUB_TOKEN }}'
+          debug: true # TODO: for some reason the above env variable just doesn't work, typical github documentation probably
+          input_encoding: 'string'
           input: 'asdf'
           script: |
+            console.log(core)
+            console.log(input)
             return '123'
+
+      - name: Test that output A is correct
+        env: { RESULT: '${{ steps.run-a.outputs.result }}' }
+        run: 'echo "A: $RESULT" >> $GITHUB_STEP_SUMMARY'
+
+      - uses: 'JaninaWibker/scripting-action@main'
+        id: run-b
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          input_encoding: 'string'
+          input: 'asdf'
+          file: './.github/scripts/test.ts'
+
+      - name: Test that output B is correct
+        env: { RESULT: '${{ steps.run-b.outputs.result }}' }
+        run: 'echo "B: $RESULT" >> $GITHUB_STEP_SUMMARY'

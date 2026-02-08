@@ -17,7 +17,7 @@ inputs:
     description: 'Inline typescript, same behavior as `file`, but acting as the body of a function instead of an entire file with a default export. Can only specify either `file` or `script`, not both. See docs for more details.'
     required: false
 
-  input-encoding:
+  input_encoding:
     description: 'Either string or json, see `input`.'
     required: false
     default: 'string'
@@ -26,7 +26,7 @@ inputs:
     description: 'Input passed to script. Depending on `input-encoding` either assumed to be a string, or passed to `JSON.parse`. Defaults to `""` or `{}` respectively. Alternatively to easier pass in more values at once use environment variables.'
     required: false
 
-  result-encoding:
+  result_encoding:
     description: 'Either string or json, see `result`.'
     required: false
     default: 'string'
@@ -63,6 +63,22 @@ runs:
     - name: 'Run script'
       id: 'run'
       shell: 'sh'
+      env:
+        # TODO: further evidence that github actions is absolutely shit and no one should be using it.
+        # TODO: https://github.com/actions/github-script/issues/56
+        # TODO: this has been open for over 5 years and is still unfixed, this just shows how broken
+        # TODO: everything that microsoft touches is.
+        INPUT_FILE: '${{ inputs.file }}'
+        INPUT_SCRIPT: '${{ inputs.script }}'
+        INPUT_INPUT_ENCODING: '${{ inputs.input_encoding }}'
+        INPUT_INPUT: '${{ inputs.input }}'
+        INPUT_RESULT_ENCODING: '${{ inputs.result_encoding }}'
+        INPUT_TOKEN: '${{ inputs.token }}'
+        INPUT_DEBUG: '${{ inputs.debug }}'
+        INPUT_RESULT: '${{ inputs.result }}'
+
+        ACTION_PATH: '${{ github.action_path }}'
+        ACTION_WORKSPACE: '${{ github.workspace }}'
       run: |
         PATH_A="${{ github.action_path }}/node_modules"
         PATH_B="${{ github.workspace }}/node_modules"
@@ -73,5 +89,5 @@ runs:
 
         bun run \
           --bun \
-          --cwd "${{ github.workspace }}" \
+          --cwd="${{ github.workspace }}" \
           "${{ github.action_path }}/src/index.ts"
