@@ -5,8 +5,8 @@ description: |
   Inspired by actions/github-script.
 
 branding:
-  icon: package
-  color: purple
+  icon: 'package'
+  color: 'purple'
 
 inputs:
   file:
@@ -39,7 +39,6 @@ inputs:
   debug:
     description: 'Whether to tell the GitHub client to log details of its requests. true or false. Default is to run in debug mode when the GitHub Actions step debug logging is turned on.'
     default: "${{ runner.debug == '1' }}"
-
 
 outputs:
   result:

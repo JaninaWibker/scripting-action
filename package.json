@@ -2,7 +2,10 @@
   "name": "scripting-action",
   "type": "module",
   "private": true,
-  "packageManager": "bun@1.3.8",
+  "scripts": {
+    "format:check": "prettier --check . &&  biome check",
+    "format:fix": "prettier --write . &&  biome format --write"
+  },
   "dependencies": {
     "@actions/core": "^3.0.0",
     "@actions/github": "^9.0.0",
@@ -10,9 +13,13 @@
     "zx": "^8.8.5"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@biomejs/biome": "^2.3.14",
+    "@types/bun": "latest",
+    "prettier": "^3.8.1",
+    "prettier-plugin-yaml": "^1.1.2"
   },
   "peerDependencies": {
     "typescript": "^5"
-  }
+  },
+  "packageManager": "bun@1.3.8"
 }
