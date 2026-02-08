@@ -4,22 +4,21 @@ description: |
   Proper scripting with TypeScript in Github Actions using bun. Includes sane defaults, useful helpers, an authenticated octokit instance and other useful integrations.
   Inspired by actions/github-script.
 
+branding:
+  icon: package
+  color: purple
+
 inputs:
   file:
-    description: 'Relative path to typescript file. This requires doing a checkout beforehand. Can only specify either `file` or `script`, not both.'
+    description: 'Relative path to typescript file. This requires doing a checkout beforehand. Can only specify either `file` or `script`, not both. Assumes the default export is the async function to run. See docs for details about the function signature, how to pass in arguments, how module resolution works and more.'
     required: false
 
   script:
-    description: 'Inline typescript, same behavior as `file`, but without having to import the supplied helpers. Can only specify either `file` or `script`, not both.'
+    description: 'Inline typescript, same behavior as `file`, but acting as the body of a function instead of an entire file with a default export. Can only specify either `file` or `script`, not both. See docs for more details.'
     required: false
-
-  result-encoding:
-    description: 'Either string or json, if returning '
-    required: false
-    default: 'string'
 
   input-encoding:
-    description: ''
+    description: 'Either string or json, see `input`.'
     required: false
     default: 'string'
 
@@ -27,10 +26,15 @@ inputs:
     description: 'Input passed to script. Depending on `input-encoding` either assumed to be a string, or passed to `JSON.parse`. Defaults to `""` or `{}` respectively. Alternatively to easier pass in more values at once use environment variables.'
     required: false
 
-  github-token:
+  result-encoding:
+    description: 'Either string or json, see `result`.'
+    required: false
+    default: 'string'
+
+  token:
     description: 'The GitHub token used to create an authenticated client'
     default: '${{ github.token }}'
-    required: false
+    required: true
 
   debug:
     description: 'Whether to tell the GitHub client to log details of its requests. true or false. Default is to run in debug mode when the GitHub Actions step debug logging is turned on.'
@@ -40,6 +44,7 @@ inputs:
 outputs:
   result:
     description: 'The return value of the script. Depending on `result-encoding` either assumed to be a string, or passed to `JSON.stringify`'
+    value: '${{ steps.run.outputs.result }}'
 
 runs:
   using: 'composite'
@@ -51,14 +56,23 @@ runs:
 
     - name: 'Install dependencies'
       working-directory: '${{ github.action_path }}'
+      shell: 'sh'
       env:
-        GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}' # TODO: does this work?
-      runs: 'bun install'
+        GITHUB_TOKEN: '${{ inputs.token }}'
+      run: 'bun install'
 
-    - name: 'TODO'
-      runs: |
-        echo 123
+    - name: 'Run script'
+      id: 'run'
+      shell: 'sh'
+      run: |
+        PATH_A="${{ github.action_path }}/node_modules"
+        PATH_B="${{ github.workspace }}/node_modules"
+        PATH_C="${{ github.workspace }}/.github/node_modules"
+        PATH_D="${{ github.workspace }}/.github/workflows/node_modules"
 
-# use ${{ github.action_path }} for local files
-# use bun, use zx, authenticate github client and things
-#
+        export NODE_PATH="$PATH_A:$PATH_B:$PATH_C:$PATH_D"
+
+        bun run \
+          --bun \
+          --cwd "${{ github.workspace }}" \
+          "${{ github.action_path }}/src/index.ts"
