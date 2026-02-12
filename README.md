@@ -194,3 +194,26 @@ The following locations can be used:
 
 You can set the `NODE_PATH` variable to modify this behavior.
 This variable is also used internally and the above paths are appended to it.
+
+
+### How do I get the types for `Context` and `Inputs`?
+
+Good question!
+
+This is a bit of a compromise.
+There is no really good way to have the types available without having to install anything locally with a package manager.
+One consideration was using the URL-based format that deno allows, but having to install a deno-specific editor extension while actually using bun sounds like trouble.
+
+**Solution**: Install the `somewhere` package (`devDependency`) such that your editor can pick up the types from there.
+This isn't needed when running in CI, but without it local development wouldn't work all too well.
+
+```ts
+import { Context, Inputs } from 'somewhere'
+```
+
+In CI the package doesn't have to be present as this can be worked around easily, but locally without having any other action specific code than the reference in the workflow doesn't work.
+Therefore the compromise via a types-only `devDependency`.
+
+## License
+
+MIT licensed © 2026 Janina Wibker
