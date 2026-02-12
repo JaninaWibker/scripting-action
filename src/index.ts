@@ -1,6 +1,7 @@
 import path from 'node:path'
 import * as core from '@actions/core'
 import { context, getOctokit } from '@actions/github'
+import * as zx from 'zx'
 import { build } from './build'
 import type { Ctx, Inputs, SanitizedInputs } from './types'
 import { validateAndTransform } from './validate'
@@ -13,7 +14,8 @@ const constructContext = (inputs: Inputs) => {
   return {
     github,
     context,
-    core
+    core,
+    zx
   }
 }
 

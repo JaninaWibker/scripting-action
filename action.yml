@@ -85,7 +85,7 @@ runs:
         PATH_C="${{ github.workspace }}/.github/node_modules"
         PATH_D="${{ github.workspace }}/.github/workflows/node_modules"
 
-        export NODE_PATH="$PATH_A:$PATH_B:$PATH_C:$PATH_D"
+        export NODE_PATH="$NODE_PATH:$PATH_A:$PATH_B:$PATH_C:$PATH_D"
 
         bun run \
           --bun \
