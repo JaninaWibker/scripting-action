@@ -1,6 +1,8 @@
 {
   "name": "scripting-action",
   "type": "module",
+  "license": "MIT",
+  "author": "Janina Wibker <me@janina.lol>",
   "private": true,
   "scripts": {
     "format:check": "prettier --check . &&  biome check",

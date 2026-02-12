@@ -3,9 +3,6 @@ on:
   push:
   workflow_dispatch:
 
-env:
-  ACTIONS_STEP_DEBUG: true
-
 jobs:
   test:
     runs-on: 'ubuntu-latest'
@@ -15,7 +12,6 @@ jobs:
         id: run-a
         with:
           token: '${{ secrets.GITHUB_TOKEN }}'
-          debug: true # TODO: for some reason the above env variable just doesn't work, typical github documentation probably
           input_encoding: 'string'
           input: 'asdf'
           script: |
@@ -30,7 +26,7 @@ jobs:
       - uses: 'JaninaWibker/scripting-action@main'
         id: run-b
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: '${{ secrets.GITHUB_TOKEN }}'
           input_encoding: 'string'
           input: 'asdf'
           file: './.github/scripts/test.ts'
